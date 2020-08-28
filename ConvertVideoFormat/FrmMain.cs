@@ -59,12 +59,19 @@ namespace ConvertVideoFormat
 
         private void backgroundWorker1_DoWork(object sender, DoWorkEventArgs e)
         {
+            
             foreach (DataGridViewRow item in this.dataGridView1.Rows)
             {
                 string fileName = item.Cells[0].Value.ToString();
                 Console.WriteLine(fileName);
                 this.richTextBox1.Text = this.richTextBox1.Text += DateTime.Now.ToString() + ": " + "正在转换:" + fileName+"\n";
-                string outputName = fileName.Substring(0, fileName.LastIndexOf("."))+"_new.mp4";
+                string extension = GetExtFormat();
+                if (extension.Length > 4)
+                {
+                    MessageBox.Show("请先选中需要转换的格式!","错误提示");
+                    return;
+                }
+                string outputName = fileName.Substring(0, fileName.LastIndexOf("."))+"_new."+extension;
                 new FFMpegHelper().Convert(fileName, outputName);
                 this.richTextBox1.Text = this.richTextBox1.Text += DateTime.Now.ToString() + ": " + "转换完成:" + outputName + "\n";
             }
@@ -89,6 +96,19 @@ namespace ConvertVideoFormat
         {
             this.btnRun.Text = "开始转换";
             this.btnRun.Enabled = true;
+        }
+
+        private string GetExtFormat()
+        {
+            foreach (Control control in this.gpOutputFormat.Controls)
+            {
+                RadioButton rd = (RadioButton)control;
+                if (rd.Checked)
+                {
+                    return rd.Text;
+                }
+            }
+            return "请先选中格式！";
         }
     }
 }
